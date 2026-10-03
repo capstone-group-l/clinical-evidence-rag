@@ -1,0 +1,45 @@
+name: Testing task
+description: Benchmark questions, metrics, or test work
+title: "[Test]: "
+labels: ["testing"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Benchmark questions (dev set)
+        - Benchmark questions (held-out final set)
+        - Retrieval metrics (Recall@5 / Precision@5)
+        - Citation integrity audit
+        - Expert review (clinical accuracy)
+        - Load / stress test
+        - Unit / integration / regression tests
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What is the goal of this testing task?
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: Method and pass/fail criteria
+    validations:
+      required: true
+  - type: input
+    id: hours
+    attributes:
+      label: Estimated effort (hours)
+      description: Number only, e.g. 3.
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Fill in when done, or link to the results file.
