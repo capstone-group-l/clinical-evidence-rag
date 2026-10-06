@@ -48,7 +48,9 @@ clinical-evidence-rag/
 ├── scripts/            # helper scripts for setup and data loading
 ├── docs/               # documentation, notes, costs and decisions
 ├── .github/            # issue templates
-└── .env.example        # example of environment variables
+├── .env.example        # example of environment variables
+├── .pre-commit-config.yaml  # checks that run before every commit
+└── ruff.toml           # Python lint and format settings
 ```
 
 ## Setup
@@ -162,9 +164,61 @@ uvicorn app.main:app --reload
 Other frontend commands, from `frontend/`:
 
 ```bash
-npm run build     # create the production build
-npm run lint      # check the code with ESLint
-npm run preview   # preview the production build locally
+npm run build         # create the production build
+npm run lint          # check the code with ESLint
+npm run format        # format the code with Prettier
+npm run format:check  # check the formatting without changing files
+npm run preview       # preview the production build locally
+```
+
+## Development tools (linting, formatting and pre-commit)
+
+We use [pre-commit](https://pre-commit.com) to check the code automatically every time you run `git commit`. The checks are listed in `.pre-commit-config.yaml`:
+
+| Check             | What it does                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| File hygiene      | removes trailing spaces, fixes line endings, checks YAML/TOML/JSON, finds private keys |
+| Ruff              | lints and formats the Python code (settings in `ruff.toml`)                            |
+| Prettier + ESLint | formats and lints the frontend code (settings in `frontend/`)                          |
+
+If a check fails, the commit is stopped.
+
+Do this setup **once**, after the steps above. Run the commands from the repository root.
+
+### macOS
+
+```bash
+source backend/.venv/bin/activate
+pip install -r backend/requirements-dev.txt
+npm --prefix frontend install
+pre-commit install
+```
+
+### Windows
+
+```powershell
+backend\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements-dev.txt
+npm --prefix frontend install
+pre-commit install
+```
+
+`requirements-dev.txt` installs everything in `requirements.txt` plus the development tools (pre-commit, Ruff, pytest and httpx). The `npm install` step is needed because the frontend checks use the ESLint and Prettier from `frontend/node_modules`.
+
+Optional: run all the checks on every file once, to see the current state of the repository:
+
+```bash
+pre-commit run --all-files
+```
+
+Useful commands (with the venv active):
+
+```bash
+pre-commit run                # run the checks on your staged files without committing
+pre-commit run --all-files    # run the checks on every file
+ruff check backend            # lint the Python code
+ruff format backend           # format the Python code
+pytest                        # run the backend tests (from backend/)
 ```
 
 ## Evaluation
