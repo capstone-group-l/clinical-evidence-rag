@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import math
 
 from app.api.v1.router import api_router
 
