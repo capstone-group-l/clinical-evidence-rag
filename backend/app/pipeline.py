@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import lru_cache
 
 from app.config import Settings
 from app.fakes import AlwaysPassVerifier, FakeRetriever, StubGenerator
@@ -35,3 +36,9 @@ def build_pipeline(settings: Settings | None = None) -> Pipeline:
         _build_generator(settings),
         AlwaysPassVerifier(),
     )
+
+
+# Built once and reused, so heavy models are not loaded per request.
+@lru_cache
+def get_pipeline() -> Pipeline:
+    return build_pipeline()
