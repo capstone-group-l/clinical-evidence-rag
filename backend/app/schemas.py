@@ -1,0 +1,48 @@
+from typing import Literal
+
+from pydantic import BaseModel, Field, model_validator
+
+
+# One passage of a source document.
+class Chunk(BaseModel):
+    id: str
+    document_id: str
+    title: str
+    text: str
+    position: int = Field(ge=0)
+
+
+# A chunk returned by a Retriever, with its score.
+class RetrievedPassage(BaseModel):
+    chunk: Chunk
+    score: float
+
+
+# A reference from an answer to one retrieved chunk.
+class Citation(BaseModel):
+    chunk_id: str
+
+
+# Raw Generator output.
+class GeneratedAnswer(BaseModel):
+    text: str
+    cited_chunk_ids: list[str]
+
+
+# POST /v1/query returns. Ensures that sources are the cited passages.
+class AnswerResponse(BaseModel):
+    status: Literal["answered", "insufficient_evidence"]
+    answer: str | None = None
+    citations: list[Citation] = []
+    sources: list[RetrievedPassage] = []
+
+    @model_validator(mode="after")
+    def check_status_rules(self) -> "AnswerResponse":
+        if self.status == "answered":
+            if not self.answer or not self.citations:
+                raise ValueError("answered needs an answer and one citation")
+        elif self.answer or self.citations:
+            raise ValueError(
+                "insufficient_evidence has no answer or citations"
+            )
+        return self
