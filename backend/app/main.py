@@ -1,9 +1,10 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
+from app.config import Settings
+
+settings = Settings()
 
 app = FastAPI(
     title="Clinical Decision Support Assistant API",
@@ -17,15 +18,9 @@ app = FastAPI(
 )
 
 # Allow the frontend to call the API from the browser.
-cors_origins = (
-    os.getenv("CORS_ORIGINS", "http://localhost:5173")
-    .replace(" ", "")
-    .split(",")
-)
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=settings.cors_origin_list,
     allow_methods=["*"],
     allow_headers=["*"],
 )
