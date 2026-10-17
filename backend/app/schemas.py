@@ -29,6 +29,11 @@ class GeneratedAnswer(BaseModel):
     cited_chunk_ids: list[str]
 
 
+# POST /v1/query body. Out-of-range lengths get a 422.
+class QueryRequest(BaseModel):
+    question: str = Field(min_length=3, max_length=500)
+
+
 # POST /v1/query returns. Ensures that sources are the cited passages.
 class AnswerResponse(BaseModel):
     status: Literal["answered", "insufficient_evidence"]
