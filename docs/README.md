@@ -1,3 +1,3 @@
 # Documentation Folder
 
-Project documentation, design notes, cost tracking and the record of key decisions.
+Project documentation, design notes, cost tracking, documents used by code and the record of key decisions.
