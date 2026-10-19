@@ -35,6 +35,11 @@ We will update this table once we choose the evidence corpus.
 | Database           | PostgreSQL with pgvector                |
 | LLM                | OpenAI API                              |
 | Medical vocabulary | UMLS API                                |
+| Embeddings         | MedCPT Query and Article Encoders       |
+| Reranking          | MedCPT Cross-Encoder                    |
+| NLI                | `cross-encoder/nli-deberta-v3-base`     |
+
+The embedding, reranking and NLI models come from Hugging Face. See [Models](#models) for the full list and how to install them.
 
 ## Repository structure
 
@@ -170,6 +175,45 @@ npm run format        # format the code with Prettier
 npm run format:check  # check the formatting without changing files
 npm run preview       # preview the production build locally
 ```
+
+## Models
+
+These are the models we use in the pipeline. They come from [Hugging Face](https://huggingface.co) and do not need an API key.
+
+| Model                                                                                           | Pipeline step                 | What it does                                                            |
+| ----------------------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
+| [`ncbi/MedCPT-Query-Encoder`](https://huggingface.co/ncbi/MedCPT-Query-Encoder)                 | Retrieval (pgvector)          | turns the clinician's question into an embedding                        |
+| [`ncbi/MedCPT-Article-Encoder`](https://huggingface.co/ncbi/MedCPT-Article-Encoder)             | Retrieval (pgvector)          | turns the evidence passages into embeddings that we store in pgvector   |
+| [`ncbi/MedCPT-Cross-Encoder`](https://huggingface.co/ncbi/MedCPT-Cross-Encoder)                 | Reranking                     | scores each question–passage pair so we keep the most relevant ones     |
+| [`cross-encoder/nli-deberta-v3-base`](https://huggingface.co/cross-encoder/nli-deberta-v3-base) | Claim-passage alignment (NLI) | checks whether a passage supports, contradicts or is neutral to a claim |
+
+The first run downloads the models to the Hugging Face cache (`~/.cache/huggingface/hub` on macOS, `%USERPROFILE%\.cache\huggingface\hub` on Windows). Later runs load them from there and work offline.
+
+### Installing the models
+
+The scripts in `scripts/` have their own virtual environment and `requirements.txt`. Run these commands from the repository root.
+
+#### macOS
+
+```bash
+cd scripts
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python check_models.py
+```
+
+#### Windows
+
+```powershell
+cd scripts
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python check_models.py
+```
+
+`check_models.py` downloads each model the first time and loads it. It should print one `loaded <model> in <N>s` line per model.
 
 ## Development tools (linting, formatting and pre-commit)
 
