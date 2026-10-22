@@ -1,32 +1,47 @@
-import { useEffect, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+import { useState } from "react";
+import { askQuestion } from "./api";
+import AnswerPanel from "./answer-panel";
 
 export default function App() {
-  const [status, setStatus] = useState("Checking the backend...");
+  const [question, setQuestion] = useState("");
+  const [state, setState] = useState({ status: "idle" });
+  const loading = state.status === "loading";
 
-  useEffect(() => {
-    async function checkBackend() {
-      try {
-        const response = await fetch(`${API_URL}/v1/health`);
-        if (!response.ok) {
-          throw new Error(`Server responded with ${response.status}`);
-        }
-
-        const health = await response.json();
-        setStatus(`Backend is up and running (version ${health.version})`);
-      } catch (error) {
-        setStatus(`Backend check failed: ${error.message}`);
-      }
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setState({ status: "loading" });
+    try {
+      const result = await askQuestion(question.trim());
+      setState({
+        status: "done",
+        result: result,
+      });
+    } catch {
+      setState({ status: "error" });
     }
-
-    checkBackend();
-  }, []);
+  }
 
   return (
     <main>
       <h1>Clinical Evidence RAG</h1>
-      <p>{status}</p>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="question">Clinical Question</label>
+        <textarea
+          id="question"
+          value={question}
+          maxLength={500}
+          rows={3}
+          onChange={(e) => setQuestion(e.target.value)}
+        />
+        <button type="submit" disabled={loading || question.trim().length < 3}>
+          Ask
+        </button>
+      </form>
+      {state.status === "loading" && <p>Searching Evidence...</p>}
+      {state.status === "error" && (
+        <p>Error occurred while fetching the answer.</p>
+      )}
+      {state.status === "done" && <AnswerPanel result={state.result} />}
     </main>
   );
 }
