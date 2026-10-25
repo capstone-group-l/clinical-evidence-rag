@@ -35,6 +35,7 @@ class DenseRetriever:
                 cur.execute(
                     """
                     SELECT c.id, c.document_id, d.title, c.text, c.position,
+                           d.source_url, d.publish_date,
                            c.embedding <=> %s::vector AS distance
                     FROM chunks AS c
                     JOIN documents AS d ON d.id = c.document_id
@@ -52,8 +53,10 @@ class DenseRetriever:
                     title=row[2],
                     text=row[3],
                     position=row[4],
+                    source_url=row[5],
+                    publish_date=row[6],
                 ),
-                score=1.0 - row[5],
+                score=1.0 - row[7],
             )
             for row in results
         ]

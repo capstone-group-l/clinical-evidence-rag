@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
@@ -10,6 +11,8 @@ class Chunk(BaseModel):
     title: str
     text: str
     position: int = Field(ge=0)
+    source_url: str | None = None
+    publish_date: date | None = None
 
 
 # A chunk returned by a Retriever, with its score.
