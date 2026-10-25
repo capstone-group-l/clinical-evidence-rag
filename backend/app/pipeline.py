@@ -23,9 +23,15 @@ def _build_retriever(settings: Settings) -> Retriever:
 
 def _build_generator(settings: Settings) -> Generator:
     if settings.llm_mode == "openai":
-        raise NotImplementedError(
-            "openai generator will be implemented in the near future"
-        )
+        from openai import OpenAI
+
+        from app.generators.openai_generator import OpenAIGenerator
+
+        key = settings.openai_api_key
+        if key is None:
+            raise RuntimeError("OpenAI API key is not set in settings")
+        client = OpenAI(api_key=key.get_secret_value(), timeout=30)
+        return OpenAIGenerator(client)
     return StubGenerator()
 
 
