@@ -15,9 +15,13 @@ class Pipeline:
 
 def _build_retriever(settings: Settings) -> Retriever:
     if settings.retriever_mode == "dense":
-        raise NotImplementedError(
-            "dense retriever will be implemented in the near future"
-        )
+        if not settings.database_url:
+            raise ValueError(
+                "DATABASE_URL is required when retriever_mode is 'dense'"
+            )
+        from app.retrievers.dense import DenseRetriever
+
+        return DenseRetriever(settings.database_url)
     return FakeRetriever()
 
 
