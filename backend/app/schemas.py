@@ -23,10 +23,15 @@ class Citation(BaseModel):
     chunk_id: str
 
 
-# Raw Generator output.
-class GeneratedAnswer(BaseModel):
+# Structured output requested from the language model.
+class GeneratedAnswerContent(BaseModel):
     text: str
     cited_chunk_ids: list[str]
+
+
+# Internal generator output, including metadata collected from the API.
+class GeneratedAnswer(GeneratedAnswerContent):
+    token_count: int | None = Field(default=None, ge=0)
 
 
 # POST /v1/query body. Out-of-range lengths get a 422.
@@ -40,6 +45,7 @@ class AnswerResponse(BaseModel):
     answer: str | None = None
     citations: list[Citation] = []
     sources: list[RetrievedPassage] = []
+    token_count: int | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def check_status_rules(self) -> "AnswerResponse":

@@ -23,10 +23,16 @@ def post_query(
 
     generated = pipeline.generator.generate(request.question, passages)
     if validate_citation_ids(generated, passages):
-        return AnswerResponse(status="insufficient_evidence")
+        return AnswerResponse(
+            status="insufficient_evidence",
+            token_count=generated.token_count,
+        )
 
     if not pipeline.verifier.verify(generated, passages):
-        return AnswerResponse(status="insufficient_evidence")
+        return AnswerResponse(
+            status="insufficient_evidence",
+            token_count=generated.token_count,
+        )
 
     # Drop duplicate IDs, keeping their order.
     cited_ids = list(dict.fromkeys(generated.cited_chunk_ids))
@@ -36,4 +42,5 @@ def post_query(
         answer=generated.text,
         citations=[Citation(chunk_id=i) for i in cited_ids],
         sources=[by_id[i] for i in cited_ids],
+        token_count=generated.token_count,
     )

@@ -95,6 +95,28 @@ p {
   margin: 0;
 }
 
+.generation-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.generation-metrics div {
+  display: grid;
+  gap: 2px;
+}
+
+.generation-metrics dt {
+  font-size: 13px;
+}
+
+.generation-metrics dd {
+  margin: 0;
+  color: var(--text-h);
+  font-family: var(--mono);
+}
+
 code,
 .counter {
   font-family: var(--mono);

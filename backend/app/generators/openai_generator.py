@@ -2,7 +2,11 @@ import logging
 
 from openai import OpenAI
 
-from app.schemas import GeneratedAnswer, RetrievedPassage
+from app.schemas import (
+    GeneratedAnswer,
+    GeneratedAnswerContent,
+    RetrievedPassage,
+)
 
 MODEL = "gpt-4o-mini"
 logger = logging.getLogger(__name__)
@@ -36,11 +40,13 @@ class OpenAIGenerator:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message},
             ],
-            response_format=GeneratedAnswer,
+            response_format=GeneratedAnswerContent,
         )
         # Log token usage
         usage = completion.usage
+        token_count = None
         if usage is not None:
+            token_count = usage.total_tokens
             logger.info(
                 "tokens in=%s out=%s",
                 usage.prompt_tokens,
@@ -49,5 +55,11 @@ class OpenAIGenerator:
         # Return the parsed answer, or an empty one if there is none
         message = completion.choices[0].message
         if message.refusal or message.parsed is None:
-            return GeneratedAnswer(text="", cited_chunk_ids=[])
-        return message.parsed
+            return GeneratedAnswer(
+                text="", cited_chunk_ids=[], token_count=token_count
+            )
+        return GeneratedAnswer(
+            text=message.parsed.text,
+            cited_chunk_ids=message.parsed.cited_chunk_ids,
+            token_count=token_count,
+        )

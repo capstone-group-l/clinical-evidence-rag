@@ -12,6 +12,7 @@ INSUFFICIENT = {
     "answer": None,
     "citations": [],
     "sources": [],
+    "token_count": None,
 }
 
 
@@ -56,6 +57,21 @@ def test_answers_with_cited_sources():
     assert body["answer"]
     assert body["citations"] == [{"chunk_id": "fake:0000"}]
     assert [s["chunk"]["id"] for s in body["sources"]] == ["fake:0000"]
+    assert body["token_count"] is None
+
+
+def test_token_count_is_returned_from_generator():
+    use_pipeline(
+        generator=FixedGenerator(
+            GeneratedAnswer(
+                text="Answer.",
+                cited_chunk_ids=["fake:0000"],
+                token_count=123,
+            )
+        )
+    )
+
+    assert post("What is X?").json()["token_count"] == 123
 
 
 def test_short_question_is_rejected():

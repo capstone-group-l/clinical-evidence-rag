@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { askQuestion } from "./api";
 import AnswerPanel from "./answer-panel";
 
 export default function App() {
   const [question, setQuestion] = useState("");
   const [state, setState] = useState({ status: "idle" });
+  const [elapsedMs, setElapsedMs] = useState(null);
+  const startedAt = useRef(null);
   const loading = state.status === "loading";
 
   async function handleSubmit(event) {
     event.preventDefault();
+    startedAt.current = performance.now();
     setState({ status: "loading" });
+    setElapsedMs(null);
     try {
       const result = await askQuestion(question.trim());
       setState({
@@ -20,6 +24,12 @@ export default function App() {
       setState({ status: "error" });
     }
   }
+
+  const handleAnswerShown = useCallback(() => {
+    if (startedAt.current !== null) {
+      setElapsedMs(performance.now() - startedAt.current);
+    }
+  }, []);
 
   return (
     <main>
@@ -41,7 +51,13 @@ export default function App() {
       {state.status === "error" && (
         <p>Error occurred while fetching the answer.</p>
       )}
-      {state.status === "done" && <AnswerPanel result={state.result} />}
+      {state.status === "done" && (
+        <AnswerPanel
+          result={state.result}
+          elapsedMs={elapsedMs}
+          onShown={handleAnswerShown}
+        />
+      )}
     </main>
   );
 }
