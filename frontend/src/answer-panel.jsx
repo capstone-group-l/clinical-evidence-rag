@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 /* This component displays the answer and sources for a given question. */
 import { useEffect } from "react";
 import GenerationMetrics from "./generation-metrics";
