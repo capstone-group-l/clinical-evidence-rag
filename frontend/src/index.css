@@ -109,3 +109,40 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.sources {
+  text-align: left;
+}
+
+.source-toggle {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-h);
+  text-align: left;
+  vertical-align: baseline;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 8px;
+  cursor: pointer;
+}
+
+.source-body {
+  padding: 0 0 12px;
+}
+
+.source-body dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 12px;
+  margin: 0 0 8px;
+  font-size: 0.9em;
+}
+
+.source-body dt {
+  font-weight: 600;
+}
+
+.source-body dd {
+  margin: 0;
+}
