@@ -30,6 +30,7 @@ class Citation(BaseModel):
 class GeneratedAnswer(BaseModel):
     text: str
     cited_chunk_ids: list[str]
+    tokens_used: int | None = None
 
 
 # POST /v1/query body. Out-of-range lengths get a 422.
@@ -43,6 +44,9 @@ class AnswerResponse(BaseModel):
     answer: str | None = None
     citations: list[Citation] = []
     sources: list[RetrievedPassage] = []
+    tokens_used: int | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def check_status_rules(self) -> "AnswerResponse":

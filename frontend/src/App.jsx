@@ -5,17 +5,17 @@ import AnswerPanel from "./answer-panel";
 export default function App() {
   const [question, setQuestion] = useState("");
   const [state, setState] = useState({ status: "idle" });
+  const [startedAt, setStartedAt] = useState(null);
   const loading = state.status === "loading";
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const requestStartedAt = performance.now();
+    setStartedAt(requestStartedAt);
     setState({ status: "loading" });
     try {
       const result = await askQuestion(question.trim());
-      setState({
-        status: "done",
-        result: result,
-      });
+      setState({ status: "done", result });
     } catch {
       setState({ status: "error" });
     }
@@ -41,7 +41,9 @@ export default function App() {
       {state.status === "error" && (
         <p>Error occurred while fetching the answer.</p>
       )}
-      {state.status === "done" && <AnswerPanel result={state.result} />}
+      {state.status === "done" && (
+        <AnswerPanel result={state.result} startedAt={startedAt} />
+      )}
     </main>
   );
 }
