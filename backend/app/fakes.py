@@ -8,6 +8,8 @@ def _fake_passage(position: int) -> RetrievedPassage:
         title="Fake document",
         text=f"This is fake passage {position}.",
         position=position,
+        source_url="https://example.org/fake",
+        publish_date="2024-01-01",
     )
     return RetrievedPassage(chunk=chunk, score=1.0 - position / 10)
 

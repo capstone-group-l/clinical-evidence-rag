@@ -15,17 +15,27 @@ class Pipeline:
 
 def _build_retriever(settings: Settings) -> Retriever:
     if settings.retriever_mode == "dense":
-        raise NotImplementedError(
-            "dense retriever will be implemented in the near future"
-        )
+        if not settings.database_url:
+            raise ValueError(
+                "DATABASE_URL is required when retriever_mode is 'dense'"
+            )
+        from app.retrievers.dense import DenseRetriever
+
+        return DenseRetriever(settings.database_url)
     return FakeRetriever()
 
 
 def _build_generator(settings: Settings) -> Generator:
     if settings.llm_mode == "openai":
-        raise NotImplementedError(
-            "openai generator will be implemented in the near future"
-        )
+        from openai import OpenAI
+
+        from app.generators.openai_generator import OpenAIGenerator
+
+        key = settings.openai_api_key
+        if key is None:
+            raise RuntimeError("OpenAI API key is not set in settings")
+        client = OpenAI(api_key=key.get_secret_value(), timeout=30)
+        return OpenAIGenerator(client)
     return StubGenerator()
 
 
