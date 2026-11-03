@@ -153,12 +153,20 @@ npm run dev
 - `(.venv)` at the start of the prompt means the virtual environment is active. A new terminal starts without it, so activate it again before running backend commands.
 - Fill in the empty values in `.env` as you get your keys. Never commit `.env`.
 
-| Variable         | What it is                                                   |
-| ---------------- | ------------------------------------------------------------ |
-| `OPENAI_API_KEY` | your key for the OpenAI API                                  |
-| `UMLS_API_KEY`   | your key for the UMLS API                                    |
-| `DATABASE_URL`   | the connection string of your PostgreSQL database            |
-| `CORS_ORIGINS`   | the URL of the frontend (default is `http://localhost:5173`) |
+| Variable               | What it is                                                       |
+| ---------------------- | ---------------------------------------------------------------- |
+| `OPENAI_API_KEY`       | your key for the OpenAI API                                      |
+| `UMLS_API_KEY`         | your key for the UMLS API                                        |
+| `DATABASE_URL`         | the connection string of your PostgreSQL database                |
+| `CORS_ORIGINS`         | the URL of the frontend (default is `http://localhost:5173`)     |
+| `RETRIEVER_MODE`       | `fake`, `dense`, `bm25` or `hybrid` (default is `fake`)          |
+| `RETRIEVER_CANDIDATES` | passages each retriever fetches in hybrid mode (default is `30`) |
+| `LLM_MODE`             | `stub` or `openai` (default is `stub`)                           |
+| `RERANK_MODE`          | `off` or `crossencoder`, (default is `off`)                      |
+| `RERANK_CANDIDATES`    | passages the reranker scores (default is `20`)                   |
+| `RERANK_TOP_K`         | passages returned, at most `RERANK_CANDIDATES` (default is `5`)  |
+
+The frontend reads `VITE_API_URL` (the backend URL, default is `http://localhost:8000`) from `frontend/.env`.
 
 When the API entry point is ready, start it from `backend/` with the venv active:
 
