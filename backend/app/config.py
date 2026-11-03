@@ -10,7 +10,7 @@ ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")
 
-    retriever_mode: Literal["fake", "dense"] = "fake"
+    retriever_mode: Literal["fake", "dense", "hybrid", "bm25"] = "fake"
     llm_mode: Literal["stub", "openai"] = "stub"
     database_url: str | None = None
     openai_api_key: SecretStr | None = None
@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     rerank_mode: Literal["off", "crossencoder"] = "off"
     rerank_candidates: int = Field(default=20, ge=1)  # passages scored
     rerank_top_k: int = Field(default=5, ge=1)  # passages returned
+    retriever_candidates: int = Field(default=30, ge=1)  # per retriever
 
     @property
     def cors_origin_list(self) -> list[str]:
