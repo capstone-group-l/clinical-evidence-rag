@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     llm_mode: Literal["stub", "openai"] = "stub"
     database_url: str | None = None
     openai_api_key: SecretStr | None = None
+    umls_api_key: SecretStr | None = None
     # Comma-separated. A str because pydantic-settings reads lists as JSON
     cors_origins: str = "http://localhost:5173"
     rerank_mode: Literal["off", "crossencoder"] = "off"
