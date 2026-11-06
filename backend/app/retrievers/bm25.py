@@ -38,7 +38,8 @@ def tokenize(text: str) -> list[str]:
 
 
 class BM25Retriever:
-    def __init__(self, chunks: list[Chunk]) -> None:
+    def __init__(self, chunks: list[Chunk], query_expander=None) -> None:
+        self.query_expander = query_expander
         self.build(chunks)
 
     # Builds a BM25 index from a list of chunks
@@ -49,7 +50,11 @@ class BM25Retriever:
 
     # Retrieves the passages most relevant to a question
     def retrieve(self, question: str, k: int = 5) -> list[RetrievedPassage]:
-        query = tokenize(question)
+        if self.query_expander is not None:
+            expanded = self.query_expander.expand(question)
+        else:
+            expanded = []
+        query = tokenize(" ".join([question, *expanded]))
         if not query or self.index is None:
             return []
 

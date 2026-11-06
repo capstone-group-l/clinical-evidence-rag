@@ -44,6 +44,24 @@ def test_no_match_returns_nothing():
     assert BM25Retriever([]).retrieve("diabetes") == []
 
 
+class SynonymExpander:
+    def expand(self, question):
+        assert question == "heart attack"
+        return ["myocardial infarction"]
+
+
+def test_query_expansion_adds_synonyms_to_bm25_query():
+    chunks = [
+        make_chunk(0, "Myocardial infarction requires urgent treatment."),
+        make_chunk(1, "Aspirin reduces cardiovascular events."),
+        make_chunk(2, "Metformin is used for type 2 diabetes."),
+    ]
+
+    results = BM25Retriever(chunks, SynonymExpander()).retrieve("heart attack")
+
+    assert [result.chunk.id for result in results] == ["doc:0000"]
+
+
 ACRONYM_CHUNKS = [
     make_chunk(0, "A cat scratch can cause infection."),
     make_chunk(1, "A CAT scan showed no bleeding."),
