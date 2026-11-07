@@ -43,7 +43,9 @@ def _build_retriever(settings: Settings) -> Retriever:
         from app.retrievers.dense import DenseRetriever
         from app.retrievers.hybrid import HybridRetriever
 
-        dense = DenseRetriever(settings.database_url)
+        dense = DenseRetriever(
+            settings.database_url, distance=settings.dense_distance
+        )
         chunks = _read_chunks(settings.database_url)
         bm25 = BM25Retriever(chunks)
         return HybridRetriever(
@@ -58,7 +60,9 @@ def _build_retriever(settings: Settings) -> Retriever:
     if settings.retriever_mode == "dense":
         from app.retrievers.dense import DenseRetriever
 
-        return DenseRetriever(settings.database_url)
+        return DenseRetriever(
+            settings.database_url, distance=settings.dense_distance
+        )
 
     if settings.retriever_mode == "bm25":
         from app.retrievers.bm25 import BM25Retriever
