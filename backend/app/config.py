@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     rerank_candidates: int = Field(default=20, ge=1)  # passages scored
     rerank_top_k: int = Field(default=5, ge=1)  # passages returned
     retriever_candidates: int = Field(default=30, ge=1)  # per retriever
+    dense_distance: Literal["cosine", "euclidean", "inner_product"] = "cosine"
 
     @property
     def cors_origin_list(self) -> list[str]:
