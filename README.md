@@ -161,6 +161,7 @@ npm run dev
 | `CORS_ORIGINS`         | the URL of the frontend (default is `http://localhost:5173`)     |
 | `RETRIEVER_MODE`       | `fake`, `dense`, `bm25` or `hybrid` (default is `fake`)          |
 | `RETRIEVER_CANDIDATES` | passages each retriever fetches in hybrid mode (default is `30`) |
+| `DENSE_DISTANCE`       | `cosine`, `euclidean` or `inner_product` (default is `cosine`)   |
 | `LLM_MODE`             | `stub` or `openai` (default is `stub`)                           |
 | `RERANK_MODE`          | `off` or `crossencoder`, (default is `off`)                      |
 | `RERANK_CANDIDATES`    | passages the reranker scores (default is `20`)                   |
