@@ -4,6 +4,7 @@ from functools import lru_cache
 from app.config import Settings
 from app.fakes import AlwaysPassVerifier, FakeRetriever, StubGenerator
 from app.interfaces import Generator, Retriever, Verifier
+from app.schemas import Chunk
 
 
 @dataclass
@@ -13,15 +14,62 @@ class Pipeline:
     verifier: Verifier
 
 
+def _read_chunks(database_url: str) -> list[Chunk]:
+    import psycopg
+    from psycopg.rows import dict_row
+
+    with psycopg.connect(database_url, row_factory=dict_row) as conn:
+        rows = conn.execute(
+            """
+            SELECT c.id, c.document_id, d.title, c.text, c.position,
+                   d.source_url, d.publish_date
+            FROM chunks AS c
+            JOIN documents AS d ON d.id = c.document_id
+            """
+        ).fetchall()
+    return [Chunk(**row) for row in rows]
+
+
 def _build_retriever(settings: Settings) -> Retriever:
+    if settings.retriever_mode != "fake" and not settings.database_url:
+        raise ValueError(
+            "DATABASE_URL is required when retriever_mode is "
+            f"'{settings.retriever_mode}'"
+        )
+
+    if settings.retriever_mode == "hybrid":
+        from app.rerankers import build_reranker
+        from app.retrievers.bm25 import BM25Retriever
+        from app.retrievers.dense import DenseRetriever
+        from app.retrievers.hybrid import HybridRetriever
+
+        dense = DenseRetriever(
+            settings.database_url, distance=settings.dense_distance
+        )
+        chunks = _read_chunks(settings.database_url)
+        bm25 = BM25Retriever(chunks)
+        return HybridRetriever(
+            dense,
+            bm25,
+            build_reranker(settings),
+            candidates=settings.retriever_candidates,
+            rerank_candidates=settings.rerank_candidates,
+            top_k=settings.rerank_top_k,
+        )
+
     if settings.retriever_mode == "dense":
-        if not settings.database_url:
-            raise ValueError(
-                "DATABASE_URL is required when retriever_mode is 'dense'"
-            )
         from app.retrievers.dense import DenseRetriever
 
-        return DenseRetriever(settings.database_url)
+        return DenseRetriever(
+            settings.database_url, distance=settings.dense_distance
+        )
+
+    if settings.retriever_mode == "bm25":
+        from app.retrievers.bm25 import BM25Retriever
+
+        chunks = _read_chunks(settings.database_url)
+        return BM25Retriever(chunks)
+
     return FakeRetriever()
 
 

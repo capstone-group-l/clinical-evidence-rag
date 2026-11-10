@@ -39,6 +39,7 @@ def use_pipeline(generator=None, verifier=None):
 
 @pytest.fixture(autouse=True)
 def clear_overrides():
+    use_pipeline()
     yield
     app.dependency_overrides.clear()
 

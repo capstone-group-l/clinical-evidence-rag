@@ -42,3 +42,11 @@ class AlwaysPassVerifier:
         self, generated: GeneratedAnswer, passages: list[RetrievedPassage]
     ) -> bool:
         return True
+
+
+# Keeps the retrieval order. Used when RERANK_MODE=off.
+class FakeReranker:
+    def rerank(
+        self, question: str, passages: list[RetrievedPassage]
+    ) -> list[RetrievedPassage]:
+        return list(passages)
