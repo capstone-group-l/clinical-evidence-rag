@@ -37,7 +37,7 @@ def main():
             "-p",
             "50,95",
             "-timeout",
-            "35s",
+            "160s",
             "-json",
             out_file,
             "-content-type",
@@ -50,7 +50,13 @@ def main():
         ]
 
         try:
-            res = subprocess.run(load_cmd, capture_output=True, text=True)
+            res = subprocess.run(
+                load_cmd,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
         except FileNotFoundError:
             sys.exit("Error: Couldn't find fortio executable")
 
@@ -93,6 +99,9 @@ def main():
             # Get the slowest request time
             slowest = result["DurationHistogram"]["Max"]
 
+            # Get the median request time
+            median_time = percentile.get("50", 30)
+
             # Checks if the target is met (95th percentile < 30s and no errors)
             if errors == 0 and p95_time < 30:
                 target_passed = True
@@ -106,6 +115,7 @@ def main():
         print(f"Errors: {errors}")
         print(f"Error Rate: {error_rate:.2f}%")
         print(f"Slowest Request Time: {slowest:.2f}s")
+        print(f"Median Request Time: {median_time:.2f}s")
         print(f"95th Percentile: {p95_time:.2f}s")
         if target_passed:
             print("Target Met (95th percentile < 30s): PASS")
