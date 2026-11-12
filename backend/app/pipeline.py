@@ -38,6 +38,7 @@ def _build_retriever(settings: Settings) -> Retriever:
         )
 
     if settings.retriever_mode == "hybrid":
+        from app.query_expansion import UMLSQueryExpander
         from app.rerankers import build_reranker
         from app.retrievers.bm25 import BM25Retriever
         from app.retrievers.dense import DenseRetriever
@@ -47,7 +48,13 @@ def _build_retriever(settings: Settings) -> Retriever:
             settings.database_url, distance=settings.dense_distance
         )
         chunks = _read_chunks(settings.database_url)
-        bm25 = BM25Retriever(chunks)
+        if settings.umls_api_key:
+            expander = UMLSQueryExpander(
+                settings.database_url, settings.umls_api_key.get_secret_value()
+            )
+        else:
+            expander = UMLSQueryExpander(settings.database_url, None)
+        bm25 = BM25Retriever(chunks, expander)
         return HybridRetriever(
             dense,
             bm25,
@@ -65,10 +72,17 @@ def _build_retriever(settings: Settings) -> Retriever:
         )
 
     if settings.retriever_mode == "bm25":
+        from app.query_expansion import UMLSQueryExpander
         from app.retrievers.bm25 import BM25Retriever
 
         chunks = _read_chunks(settings.database_url)
-        return BM25Retriever(chunks)
+        expander = UMLSQueryExpander(
+            settings.database_url,
+            settings.umls_api_key.get_secret_value()
+            if settings.umls_api_key
+            else None,
+        )
+        return BM25Retriever(chunks, expander)
 
     return FakeRetriever()
 
