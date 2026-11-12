@@ -23,23 +23,35 @@ export default function App() {
 
   return (
     <main>
-      <h1>Clinical Evidence RAG</h1>
-      <form onSubmit={handleSubmit}>
+      <header className="masthead">
+        <h1>Clinical Evidence RAG</h1>
+        <p>Research and education only. Not for clinical decisions.</p>
+      </header>
+      <form className="ask" onSubmit={handleSubmit}>
         <label htmlFor="question">Clinical Question</label>
         <textarea
           id="question"
           value={question}
           maxLength={500}
-          rows={3}
+          rows={4}
           onChange={(e) => setQuestion(e.target.value)}
         />
-        <button type="submit" disabled={loading || question.trim().length < 3}>
-          Ask
-        </button>
+        <div className="ask-actions">
+          <button
+            type="submit"
+            disabled={loading || question.trim().length < 3}
+          >
+            Ask
+          </button>
+        </div>
       </form>
-      {state.status === "loading" && <p>Searching Evidence...</p>}
+      {state.status === "loading" && (
+        <p className="status status-loading">Searching the evidence…</p>
+      )}
       {state.status === "error" && (
-        <p>Error occurred while fetching the answer.</p>
+        <p className="status" role="alert">
+          The answer could not be loaded. Try again.
+        </p>
       )}
       {state.status === "done" && (
         <AnswerPanel result={state.result} startedAt={startedAt} />

@@ -30,7 +30,7 @@ export default function AnswerPanel({ result, startedAt }) {
           tokensUsed={result.tokens_used}
           startedAt={startedAt}
         />
-        <p>Insufficient evidence to answer the question.</p>
+        <p className="notice">Insufficient evidence to answer the question.</p>
       </>
     );
   }
@@ -40,9 +40,9 @@ export default function AnswerPanel({ result, startedAt }) {
         tokensUsed={result.tokens_used}
         startedAt={startedAt}
       />
-      <section aria-labelledby="answer-heading">
+      <section className="result" aria-labelledby="answer-heading">
         <h2 id="answer-heading">Answer</h2>
-        <p>
+        <p className="answer">
           {result.answer}{" "}
           {result.citations.map((citation, index) => (
             <a
