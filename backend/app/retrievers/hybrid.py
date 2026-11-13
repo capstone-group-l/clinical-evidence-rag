@@ -8,8 +8,8 @@ from app.schemas import RetrievedPassage
 
 logger = logging.getLogger(__name__)
 
-DENSE_WEIGHT = 0.5
-BM25_WEIGHT = 0.5
+DENSE_WEIGHT = 0.4
+BM25_WEIGHT = 0.6
 
 
 class FusedPassage(TypedDict):
