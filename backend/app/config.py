@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     database_url: str | None = None
     openai_api_key: SecretStr | None = None
     umls_api_key: SecretStr | None = None
+    umls_enabled: bool = True
     # Comma-separated. A str because pydantic-settings reads lists as JSON
     cors_origins: str = "http://localhost:5173"
     rerank_mode: Literal["off", "crossencoder"] = "off"
