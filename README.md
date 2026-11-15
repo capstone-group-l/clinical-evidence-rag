@@ -157,6 +157,7 @@ npm run dev
 | ---------------------- | ---------------------------------------------------------------- |
 | `OPENAI_API_KEY`       | your key for the OpenAI API                                      |
 | `UMLS_API_KEY`         | your key for the UMLS API                                        |
+| `UMLS_ENABLED`         | enable UMLS query expansion for BM25 and hybrid retrieval (default is `true`) |
 | `DATABASE_URL`         | the connection string of your PostgreSQL database                |
 | `CORS_ORIGINS`         | the URL of the frontend (default is `http://localhost:5173`)     |
 | `RETRIEVER_MODE`       | `fake`, `dense`, `bm25` or `hybrid` (default is `fake`)          |
