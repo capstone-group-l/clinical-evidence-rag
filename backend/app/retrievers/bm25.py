@@ -4,6 +4,7 @@ from app.schemas import Chunk, RetrievedPassage
 from rank_bm25 import BM25Okapi
 
 TOKEN = re.compile(r"\w+(?:[-./']\w+)*")
+UMLS_WEIGHT = 0.25
 
 
 def acronym(word: str) -> str | None:
@@ -38,7 +39,8 @@ def tokenize(text: str) -> list[str]:
 
 
 class BM25Retriever:
-    def __init__(self, chunks: list[Chunk]) -> None:
+    def __init__(self, chunks: list[Chunk], query_expander=None) -> None:
+        self.query_expander = query_expander
         self.build(chunks)
 
     # Builds a BM25 index from a list of chunks
@@ -49,11 +51,18 @@ class BM25Retriever:
 
     # Retrieves the passages most relevant to a question
     def retrieve(self, question: str, k: int = 5) -> list[RetrievedPassage]:
+        if self.query_expander is not None:
+            expanded = self.query_expander.expand(question)
+        else:
+            expanded = []
         query = tokenize(question)
+        umls_query = tokenize(" ".join(expanded))
         if not query or self.index is None:
             return []
 
         scores = self.index.get_scores(query)
+        if umls_query:
+            scores += UMLS_WEIGHT * self.index.get_scores(umls_query)
         pairs = list(enumerate(scores))
         pairs.sort(key=lambda pair: pair[1], reverse=True)
 
