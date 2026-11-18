@@ -1,15 +1,26 @@
-// This is a test file for the App component. It uses Vitest and React Testing Library to test the backend health check functionality of the App.
-import { afterEach, describe, expect, test } from "vitest";
+// Tests for the AskPage component (clinical question form). Uses Vitest and React Testing Library.
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import App from "./App";
+import AskPage from "./AskPage";
+import { useAuth } from "./auth-context";
+
+vi.mock("./auth-context", () => ({ useAuth: vi.fn() }));
+useAuth.mockReturnValue({
+  session: { user: { user_metadata: { display_name: "Juan del Pueblo" } } },
+});
 
 afterEach(() => {
   cleanup();
 });
 
 describe("Clinical query page", () => {
+  test("greets the user by name", () => {
+    render(<AskPage />);
+    expect(screen.getByText("Hello, Juan del Pueblo")).toBeInTheDocument();
+  });
+
   test("renders the clinical question form", () => {
-    render(<App />);
+    render(<AskPage />);
 
     expect(
       screen.getByRole("heading", {
@@ -27,7 +38,7 @@ describe("Clinical query page", () => {
   });
 
   test("Ask button is disabled when the question is too short", () => {
-    render(<App />);
+    render(<AskPage />);
 
     const questionBox = screen.getByLabelText("Clinical Question");
 
@@ -47,7 +58,7 @@ describe("Clinical query page", () => {
   });
 
   test("Ask button becomes enabled for a valid question", () => {
-    render(<App />);
+    render(<AskPage />);
 
     const questionBox = screen.getByLabelText("Clinical Question");
 
