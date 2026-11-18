@@ -170,6 +170,8 @@ npm run dev
 
 The frontend reads `VITE_API_URL` (the backend URL, default is `http://localhost:8000`) from `frontend/.env`.
 
+For sign-in it also reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `frontend/.env`.
+
 When the API entry point is ready, start it from `backend/` with the venv active:
 
 ```bash
