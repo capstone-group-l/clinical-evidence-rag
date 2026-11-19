@@ -1,7 +1,24 @@
 FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+ENV HF_HOME=/opt/huggingface
+ENV HF_HUB_CACHE=/opt/huggingface/hub
+
 WORKDIR /app
+
 COPY requirements.txt requirements-ml.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-ml.txt
+
+RUN HF_HUB_DISABLE_TELEMETRY=1 python -c "\
+from transformers import AutoModel, AutoModelForSequenceClassification, AutoTokenizer; \
+AutoTokenizer.from_pretrained('ncbi/MedCPT-Query-Encoder'); \
+AutoModel.from_pretrained('ncbi/MedCPT-Query-Encoder'); \
+AutoTokenizer.from_pretrained('ncbi/MedCPT-Cross-Encoder'); \
+AutoModelForSequenceClassification.from_pretrained('ncbi/MedCPT-Cross-Encoder')"
+
 COPY app ./app
-ENV PYTHONUNBUFFERED=1
+
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
