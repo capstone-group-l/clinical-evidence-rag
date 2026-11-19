@@ -1,16 +1,28 @@
 // Tests for the AskPage component (clinical question form). Uses Vitest and React Testing Library.
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import AskPage from "./AskPage";
 import { useAuth } from "./auth-context";
+import { isPipelineReady } from "./api";
 
 vi.mock("./auth-context", () => ({ useAuth: vi.fn() }));
+vi.mock("./api", () => ({
+  askQuestion: vi.fn(),
+  isPipelineReady: vi.fn().mockResolvedValue(true),
+}));
 useAuth.mockReturnValue({
   session: { user: { user_metadata: { display_name: "Juan del Pueblo" } } },
 });
 
 afterEach(() => {
   cleanup();
+  isPipelineReady.mockResolvedValue(true);
 });
 
 describe("Clinical query page", () => {
@@ -19,7 +31,7 @@ describe("Clinical query page", () => {
     expect(screen.getByText("Hello, Juan del Pueblo")).toBeInTheDocument();
   });
 
-  test("renders the clinical question form", () => {
+  test("renders the clinical question form", async () => {
     render(<AskPage />);
 
     expect(
@@ -30,21 +42,23 @@ describe("Clinical query page", () => {
 
     expect(screen.getByLabelText("Clinical Question")).toBeInTheDocument();
 
-    expect(
+    await waitFor(() =>
       screen.getByRole("button", {
         name: "Ask",
       }),
-    ).toBeInTheDocument();
+    );
   });
 
-  test("Ask button is disabled when the question is too short", () => {
+  test("Ask button is disabled when the question is too short", async () => {
     render(<AskPage />);
 
     const questionBox = screen.getByLabelText("Clinical Question");
 
-    const askButton = screen.getByRole("button", {
-      name: "Ask",
-    });
+    const askButton = await waitFor(() =>
+      screen.getByRole("button", {
+        name: "Ask",
+      }),
+    );
 
     expect(askButton).toBeDisabled();
 
@@ -57,14 +71,16 @@ describe("Clinical query page", () => {
     expect(askButton).toBeDisabled();
   });
 
-  test("Ask button becomes enabled for a valid question", () => {
+  test("Ask button becomes enabled for a valid question", async () => {
     render(<AskPage />);
 
     const questionBox = screen.getByLabelText("Clinical Question");
 
-    const askButton = screen.getByRole("button", {
-      name: "Ask",
-    });
+    const askButton = await waitFor(() =>
+      screen.getByRole("button", {
+        name: "Ask",
+      }),
+    );
 
     fireEvent.change(questionBox, {
       target: {
@@ -72,6 +88,6 @@ describe("Clinical query page", () => {
       },
     });
 
-    expect(askButton).toBeEnabled();
+    await waitFor(() => expect(askButton).toBeEnabled());
   });
 });

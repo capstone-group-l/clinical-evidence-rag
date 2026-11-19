@@ -14,3 +14,8 @@ export async function askQuestion(question) {
   }
   return response.json();
 }
+
+export async function isPipelineReady() {
+  const response = await fetch(`${API_URL}/v1/ready`);
+  return response.ok;
+}
