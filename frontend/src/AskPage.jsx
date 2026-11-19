@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { askQuestion } from "./api";
+import { useEffect, useState } from "react";
+import { askQuestion, isPipelineReady } from "./api";
 import AnswerPanel from "./answer-panel";
 import { useAuth } from "./auth-context";
 
@@ -11,10 +11,41 @@ export default function AskPage() {
   const [question, setQuestion] = useState("");
   const [state, setState] = useState({ status: "idle" });
   const [startedAt, setStartedAt] = useState(null);
+  const [modelsReady, setModelsReady] = useState(false);
   const loading = state.status === "loading";
+
+  useEffect(() => {
+    let active = true;
+    let timer;
+
+    async function checkReadiness() {
+      try {
+        const ready = await isPipelineReady();
+        if (!active) {
+          return;
+        }
+        if (ready) {
+          setModelsReady(true);
+          return;
+        }
+      } catch {
+        // Prevents the user from submitting questions while pipeline not ready
+      }
+      if (active) {
+        timer = window.setTimeout(checkReadiness, 1000);
+      }
+    }
+
+    checkReadiness();
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (!modelsReady) return;
     const requestStartedAt = performance.now();
     setStartedAt(requestStartedAt);
     setState({ status: "loading" });
@@ -37,7 +68,7 @@ export default function AskPage() {
           it used.
         </p>
         <ul>
-          <li>Be specific and concise. Avoid vague quesitons.</li>
+          <li>Be specific and concise. Avoid vague questions.</li>
           <li>Type your question below and press Ask.</li>
           <li>Click a citation number or source title to read the evidence.</li>
         </ul>
@@ -61,10 +92,10 @@ export default function AskPage() {
           <button
             type="submit"
             className="ask-button"
-            disabled={loading || question.trim().length < 3}
+            disabled={loading || !modelsReady || question.trim().length < 3}
           >
-            {loading && <span className="spinner" />}
-            {loading ? "Searching..." : "Ask"}
+            {(loading || !modelsReady) && <span className="spinner" />}
+            {loading ? "Searching..." : !modelsReady ? "Please wait..." : "Ask"}
           </button>
         </div>
       </form>
