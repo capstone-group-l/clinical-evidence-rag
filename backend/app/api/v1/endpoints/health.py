@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -19,3 +20,14 @@ class HealthResponse(BaseModel):
 )
 async def get_health() -> HealthResponse:
     return HealthResponse(status="ok", version="1.0.0")
+
+
+@router.get(
+    "/ready",
+    summary="Check Pipeline Readiness",
+)
+async def get_readiness(request: Request):
+    ready = getattr(request.app.state, "pipeline_ready", False)
+    if ready:
+        return JSONResponse(status_code=200, content={"status": "ready"})
+    return JSONResponse(status_code=503, content={"status": "loading"})
