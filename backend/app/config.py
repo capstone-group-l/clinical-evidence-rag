@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     rerank_top_k: int = Field(default=5, ge=1)  # passages returned
     retriever_candidates: int = Field(default=30, ge=1)  # per retriever
     dense_distance: Literal["cosine", "euclidean", "inner_product"] = "cosine"
+    supabase_url: str | None = None
+    supabase_anon_key: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:

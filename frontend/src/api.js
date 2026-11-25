@@ -19,3 +19,27 @@ export async function isPipelineReady() {
   const response = await fetch(`${API_URL}/v1/ready`);
   return response.ok;
 }
+
+export async function getMe(accessToken) {
+  const response = await fetch(`${API_URL}/v1/me`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
+}
+
+export async function getUsers(accessToken, page) {
+  const response = await fetch(`${API_URL}/v1/admin/users?page=${page}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Server responded with ${response.status}`);
+  }
+  return response.json();
+}

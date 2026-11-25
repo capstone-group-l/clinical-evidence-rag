@@ -268,6 +268,13 @@ a {
   box-shadow: 0 4px 12px var(--color-border);
 }
 
+.menu-role {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
 .menu-email {
   padding: 4px 0 8px;
   margin-bottom: 4px;
@@ -430,4 +437,53 @@ a {
   .source-body dd {
     margin-bottom: 8px;
   }
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.users-table th,
+.users-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.users-table th {
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  font-weight: 600;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.pagination button {
+  min-height: 36px;
+  padding: 0 14px;
+  font: inherit;
+  color: var(--color-accent);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  color: var(--color-disabled);
+  cursor: default;
 }

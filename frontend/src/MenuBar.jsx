@@ -4,7 +4,7 @@ import { useAuth } from "./auth-context";
 import { supabase } from "./supabase";
 
 export default function MenuBar() {
-  const { session } = useAuth();
+  const { session, role } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -20,10 +20,16 @@ export default function MenuBar() {
       </button>
       {open && (
         <nav className="menu-dropdown">
+          {role && <span className="menu-role">{role}</span>}
           <span className="menu-email">{session?.user?.email}</span>
           <NavLink to="/" end onClick={() => setOpen(false)}>
             Ask
           </NavLink>
+          {role === "admin" && (
+            <NavLink to="/admin/users" onClick={() => setOpen(false)}>
+              Users
+            </NavLink>
+          )}
           <button
             type="button"
             className="link-button"
