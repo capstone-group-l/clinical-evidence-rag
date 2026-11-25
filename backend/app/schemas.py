@@ -58,3 +58,19 @@ class AnswerResponse(BaseModel):
                 "insufficient_evidence has no answer or citations"
             )
         return self
+
+
+# User profile response for GET /v1/me
+class UserOut(BaseModel):
+    user_id: str
+    email: str
+    role: str
+    status: str
+
+
+# Response for GET /v1/admin/users
+class UserPage(BaseModel):
+    users: list[UserOut]
+    total: int
+    page: int
+    page_size: int

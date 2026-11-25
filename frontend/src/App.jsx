@@ -3,6 +3,7 @@ import AppLayout from "./AppLayout";
 import AskPage from "./AskPage";
 import LoginPage from "./LoginPage";
 import RequireAuth from "./RequireAuth";
+import UsersPage from "./UsersPage";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         }
       >
         <Route path="/" element={<AskPage />} />
+        <Route path="/admin/users" element={<UsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
